@@ -3,7 +3,8 @@ def mod_sqrt(a, p):
     a %= p
     if a < 2:
         return a
-    assert pow(a, (p - 1) // 2, p) == 1
+    if pow(a, (p - 1) // 2, p) != 1:
+        return None
     if p & 3 == 3:
         return pow(a, (p + 1) // 4, p)
 

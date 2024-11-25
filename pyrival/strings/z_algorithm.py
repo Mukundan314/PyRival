@@ -1,4 +1,3 @@
-
 def z_function(S):
     """
     Z Algorithm in O(n)
