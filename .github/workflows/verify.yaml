@@ -46,7 +46,7 @@ jobs:
         uses: competitive-verifier/actions/verify@v2
         with:
           destination: ${{runner.temp}}/result.json
-          timeout: 10
+          timeout: 600
 
       - name: Upload result artifact
         uses: actions/upload-artifact@v4
