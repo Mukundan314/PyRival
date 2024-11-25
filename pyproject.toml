@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PyRival"
+authors = [ { name = "Cheran Senthil", email = "cheran.v.senthil@gmail.com" } ]
+description = "Competitive Programming Library"
+readme = "README.md"
+keywords = ["competitive-programming", "data-structures", "algorithms"]
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://github.com/cheran-senthil/PyRival"
+source = "https://github.com/cheran-senthil/PyRival"
+documentation = "https://pyrival.readthedocs.io"
+issues = "https://github.com/cheran-senthil/PyRival/issues"
+
+[project.scripts]
+interactive-runner = "pyrival.tools.interactive_runner:main"
+
+[tool.setuptools]
+packages = ["pyrival"]
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+version_file = "pyrival/version.py"
+
+# -----------------------------------------------------------------------------
+
+[tool.isort]
+line_length = 120
+
+[tool.yapf]
+based_on_style = "pep8"
+column_limit = 120
