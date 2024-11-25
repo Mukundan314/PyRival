@@ -1,4 +1,4 @@
-# disabled: competitive-verifier: PROBLEM https://judge.yosupo.jp/problem/kth_term_of_linearly_recurrent_sequence
+# disabled: PROBLEM https://judge.yosupo.jp/problem/kth_term_of_linearly_recurrent_sequence
 
 import pyrival.misc.FastIO  # noqa
 import pyrival.numerical.berlekamp_massey
