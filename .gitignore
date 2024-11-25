@@ -108,3 +108,6 @@ venv.bak/
 
 # setuptools_scm
 pyrival/version.py
+
+# competitive-verifier
+.competitive-verifier/cache/
