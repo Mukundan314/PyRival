@@ -1,6 +1,18 @@
 name: verify
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   setup:
@@ -28,10 +40,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [setup]
     env:
-      SPLIT_SIZE: "8"
+      SPLIT_SIZE: "4"
     strategy:
       matrix:
-        index: ["0", "1", "2", "3", "4", "5", "6", "7"]
+        index: ["0", "1", "2", "3"]
     steps:
       - uses: actions/checkout@v4
 
@@ -50,10 +62,76 @@ jobs:
       - name: Verify
         uses: competitive-verifier/actions/verify@v2
         with:
-          write-summary: true
-          tle: 5
-          timeout: 300
           destination: ${{runner.temp}}/result.json
           split-size: ${{ env.SPLIT_SIZE }}
           split-index: ${{ matrix.index }}
-          check: true
+          timeout: 300
+          tle: 5
+
+      - name: Upload result artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Result-${{ runner.os }}-${{ matrix.index }}
+          path: ${{runner.temp}}/result.json
+          retention-days: 1
+
+  docs-and-check:
+    runs-on: ubuntu-latest
+    needs: [verify]
+    outputs:
+      upload-pages: ${{steps.upload-pages.outcome == 'success'}}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2147483647
+  
+      - name: Download verify_files.json and all artifacts
+        id: all-artifacts
+        uses: competitive-verifier/actions/download-verify-artifact@v2
+        with:
+          download-all: true
+          artifact-root: .artifacts/
+  
+      - name: Set up competitive-verifier
+        uses: competitive-verifier/actions/setup@v2
+        with:
+          cache-pip: true
+
+      - name: Docs
+        uses: competitive-verifier/actions/docs@v2
+        with:
+          verify-result: ${{ steps.all-artifacts.outputs.artifacts-root }}/Result-*/result.json
+          destination: _jekyll
+          write-summary: true
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: _jekyll
+          destination: _site
+
+      - name: Upload artifact
+        id: upload-pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Check
+        uses: competitive-verifier/actions/check@v2
+        with:
+          verify-result: ${{ steps.all-artifacts.outputs.artifacts-root }}/Result-*/result.json
+
+  deploy:
+    if: (success() || failure()) && github.ref == 'refs/heads/master' && needs.docs-and-check.outputs.upload-pages == 'true'
+    runs-on: ubuntu-latest
+    needs: [docs-and-check]
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3
