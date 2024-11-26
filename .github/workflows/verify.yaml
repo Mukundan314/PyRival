@@ -50,14 +50,10 @@ jobs:
       - name: Verify
         uses: competitive-verifier/actions/verify@v2
         with:
+          write-summary: true
+          tle: 5
+          timeout: 300
           destination: ${{runner.temp}}/result.json
           split-size: ${{ env.SPLIT_SIZE }}
           split-index: ${{ matrix.index }}
-          timeout: 300
-
-      - name: Upload result artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Result-${{ runner.os }}-${{ matrix.index }}
-          path: ${{runner.temp}}/result.json
-          retention-days: 1
+          check: true
